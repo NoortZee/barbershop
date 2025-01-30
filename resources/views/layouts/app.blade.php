@@ -11,8 +11,17 @@
         :root {
             --primary-color: #1a1a1a;
             --accent-color: #c5a47e;
+            --accent-color-dark: #b08f68;
             --text-color: #333;
             --light-bg: #f8f9fa;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
         }
         
         body {
@@ -65,10 +74,28 @@
             width: 100%;
         }
 
+        .nav-btn {
+            background-color: var(--accent-color);
+            color: white !important;
+            padding: 10px 25px !important;
+            border-radius: 30px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(197, 164, 126, 0.3);
+        }
+
         main {
             flex: 1 0 auto;
-            padding: 4rem 0;
-            margin-top: 90px;
+            padding: 3rem 0;
+            margin-top: 80px;
         }
 
         .hero-section {
@@ -83,45 +110,64 @@
 
         .hero-content {
             text-align: center;
+            padding: 4rem 0;
         }
 
         .hero-title {
             font-size: 4rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             animation: fadeInDown 1s ease-out;
         }
 
         .hero-subtitle {
             font-size: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             opacity: 0.9;
             animation: fadeInUp 1s ease-out;
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: var(--transition);
         }
 
         .btn-premium {
             background-color: var(--accent-color);
             color: white;
-            padding: 1rem 2.5rem;
-            border-radius: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(197, 164, 126, 0.2);
         }
 
-        .btn-premium:hover {
-            background-color: #b08f68;
+        .btn-premium:hover, .btn-premium:focus {
+            background-color: var(--accent-color-dark);
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(197, 164, 126, 0.4);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-outline:hover, .btn-outline:focus {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
         }
 
         .section {
-            padding: 6rem 0;
+            padding: 4rem 0;
         }
 
         .section-title {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
             position: relative;
         }
 
@@ -138,28 +184,57 @@
 
         .card {
             border: none;
-            border-radius: 0;
-            transition: all 0.3s ease;
+            border-radius: 15px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            overflow: hidden;
         }
 
         .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .card:hover .card-img-top {
+            transform: scale(1.05);
         }
 
         footer {
             background-color: var(--primary-color);
             color: white;
-            padding-top: 4rem;
+            padding-top: 3rem;
         }
 
         .footer-content {
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .footer-title {
             color: var(--accent-color);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .footer-links {
@@ -224,6 +299,14 @@
                 transform: translateY(0);
             }
         }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .fade-in-down {
+            animation: fadeInDown 0.6s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -245,8 +328,40 @@
                         <a class="nav-link" href="/barbers">Мастера</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-premium ms-3" href="/appointments/create">Записаться</a>
+                        <a class="nav-link" href="{{ route('reviews.index') }}">Отзывы</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-btn" href="/appointments/create">ЗАПИСАТЬСЯ</a>
+                    </li>
+                    @guest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">{{ __('Вход') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">{{ __('Регистрация') }}</a>
+                        </li>
+                    @else
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ Auth::user()->name }}
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                    {{ __('Профиль') }}
+                                </a>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                                    {{ __('Выход') }}
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </div>
+                        </li>
+                    @endguest
                 </ul>
             </div>
         </div>

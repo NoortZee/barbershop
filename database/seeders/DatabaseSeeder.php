@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Service;
 use App\Models\Barber;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // Создаем тестового пользователя
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password')
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        // Создаем дополнительных пользователей
+        User::factory(5)->create();
 
         // Создаем услуги
         $services = [
@@ -138,5 +142,8 @@ class DatabaseSeeder extends Seeder
         foreach ($barbers as $barber) {
             Barber::create($barber);
         }
+
+        // Создаем отзывы
+        $this->call(ReviewSeeder::class);
     }
 }

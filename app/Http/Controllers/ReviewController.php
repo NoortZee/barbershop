@@ -15,9 +15,23 @@ class ReviewController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reviews = Review::with('user')->latest()->get();
+        $query = Review::with('user', 'barber')->latest();
+
+        // Фильтрация по рейтингу
+        if ($request->has('rating')) {
+            $rating = $request->rating;
+            $query->where('rating', $rating);
+        }
+
+        // Пагинация по 6 отзывов на страницу
+        $reviews = $query->paginate(6);
+
+        if ($request->ajax()) {
+            return view('reviews.partials.reviews-list', compact('reviews'));
+        }
+
         return view('reviews.index', compact('reviews'));
     }
 

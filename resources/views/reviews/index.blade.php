@@ -26,54 +26,25 @@
             </div>
         @endif
 
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="rating-filter">
+                    <span class="me-3">Фильтр по оценке:</span>
+                    <div class="btn-group">
+                        <a href="{{ request()->url() }}" class="btn {{ !request('rating') ? 'btn-premium' : 'btn-outline-secondary' }}">Все</a>
+                        @foreach(range(5, 1) as $rating)
+                            <a href="{{ request()->url() }}?rating={{ $rating }}" 
+                               class="btn {{ request('rating') == $rating ? 'btn-premium' : 'btn-outline-secondary' }}">
+                                {{ $rating }} <i class="fas fa-star"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4">
-            @forelse($reviews as $review)
-                <div class="col-md-6">
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="review-author">
-                                <div class="author-avatar">
-                                    {{ substr($review->user->name, 0, 1) }}
-                                </div>
-                                <div class="author-info">
-                                    <h4>{{ $review->user->name }}</h4>
-                                    <div class="review-date">{{ $review->created_at->format('d.m.Y') }}</div>
-                                </div>
-                            </div>
-                            <div class="review-rating">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star {{ $i <= $review->rating ? 'active' : '' }}"></i>
-                                @endfor
-                            </div>
-                        </div>
-                        <div class="review-content">
-                            <p>{{ $review->comment }}</p>
-                        </div>
-                        @auth
-                            @if(auth()->user()->id === $review->user_id)
-                                <div class="review-actions">
-                                    <a href="{{ route('reviews.edit', $review) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i> Редактировать
-                                    </a>
-                                    <form action="{{ route('reviews.destroy', $review) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Вы уверены?')">
-                                            <i class="fas fa-trash"></i> Удалить
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        Пока нет отзывов. Будьте первым!
-                    </div>
-                </div>
-            @endforelse
+            @include('reviews.partials.reviews-list')
         </div>
     </div>
 </div>
@@ -165,6 +136,27 @@
     border-top: 1px solid rgba(0,0,0,0.1);
 }
 
+.rating-filter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.rating-filter .btn-group {
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.rating-filter .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+}
+
+.rating-filter .btn:not(:last-child) {
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+
 .btn-premium {
     background-color: var(--accent-color);
     color: white;
@@ -179,6 +171,17 @@
     background-color: var(--accent-color-dark);
     color: white;
     transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: #333;
 }
 </style>
 @endsection 

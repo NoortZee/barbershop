@@ -21,4 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/check-availability', [AppointmentController::class, 'checkAvailabilityApi']);
+    Route::get('/appointments/check-availability', [AppointmentController::class, 'checkAvailabilityApi']);
 });
+
+Route::get('/available-times', [AppointmentController::class, 'getAvailableTimes']);

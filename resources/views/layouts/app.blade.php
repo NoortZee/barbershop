@@ -92,6 +92,37 @@
             box-shadow: 0 4px 15px rgba(197, 164, 126, 0.3);
         }
 
+        /* Стили для выпадающего меню пользователя */
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .nav-item.dropdown .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff !important;
+        }
+
+        .dropdown-menu {
+            background-color: var(--primary-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
         main {
             flex: 1 0 auto;
             padding: 3rem 0;
@@ -343,17 +374,18 @@
                     @else
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <i class="fas fa-user me-1"></i>
                                 {{ Auth::user()->name }}
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    {{ __('Профиль') }}
+                                    <i class="fas fa-user-edit me-2"></i>{{ __('Профиль') }}
                                 </a>
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">
-                                    {{ __('Выход') }}
+                                    <i class="fas fa-sign-out-alt me-2"></i>{{ __('Выход') }}
                                 </a>
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -422,5 +454,6 @@
             }
         });
     </script>
+    @stack('scripts')
 </body>
 </html>

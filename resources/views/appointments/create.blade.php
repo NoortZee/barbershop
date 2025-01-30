@@ -46,7 +46,9 @@
                             <select name="barber_id" id="barber_id" class="form-select custom-select" required>
                                 <option value="">-- Выберите барбера --</option>
                                 @foreach($barbers as $barber)
-                                    <option value="{{ $barber->id }}" {{ old('barber_id') == $barber->id ? 'selected' : '' }}>
+                                    <option value="{{ $barber->id }}" 
+                                        {{ old('barber_id') == $barber->id ? 'selected' : '' }}
+                                        {{ $selectedBarberId == $barber->id ? 'selected' : '' }}>
                                         {{ $barber->name }}
                                     </option>
                                 @endforeach

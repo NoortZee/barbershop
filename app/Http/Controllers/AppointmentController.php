@@ -25,12 +25,13 @@ class AppointmentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $services = Service::where('is_active', true)->get();
         $barbers = Barber::where('is_active', true)->get();
+        $selectedBarberId = $request->query('barber_id');
 
-        return view('appointments.create', compact('services', 'barbers'));
+        return view('appointments.create', compact('services', 'barbers', 'selectedBarberId'));
     }
 
     /**

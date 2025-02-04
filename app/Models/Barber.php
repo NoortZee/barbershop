@@ -32,4 +32,15 @@ class Barber extends Model
     {
         return $this->belongsToMany(Service::class);
     }
+
+    public function getWorkingHoursForDay($day)
+    {
+        return $this->working_hours[$day] ?? null;
+    }
+
+    public function isAvailable($date)
+    {
+        $dayOfWeek = strtolower(date('D', strtotime($date)));
+        return isset($this->working_hours[$dayOfWeek]) && $this->is_active;
+    }
 }

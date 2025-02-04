@@ -6,6 +6,7 @@ use App\Http\Controllers\BarberController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\BarberScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,10 +31,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('services', ServiceController::class);
-    Route::resource('barbers', BarberController::class);
     Route::resource('appointments', AppointmentController::class);
     Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
     Route::resource('reviews', ReviewController::class)->except(['index', 'show']);
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::resource('barbers', BarberController::class)->except(['index', 'show']);
+    Route::get('/barbers/{barber}/schedule', [BarberScheduleController::class, 'edit'])->name('barbers.schedule.edit');
+    Route::put('/barbers/{barber}/schedule', [BarberScheduleController::class, 'update'])->name('barbers.schedule.update');
 });
 
 Route::middleware(['auth'])->group(function () {

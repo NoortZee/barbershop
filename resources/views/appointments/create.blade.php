@@ -16,7 +16,7 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('appointments.store') }}" method="POST" id="appointmentForm">
+                    <form action="{{ route('appointments.store') }}" method="POST" id="appointmentForm" class="needs-validation" novalidate>
                         @csrf
                         
                         <!-- Шаг 1: Выбор услуги -->
@@ -29,7 +29,7 @@
                                     @foreach($services as $service)
                                         <div class="service-item">
                                             <input type="checkbox" 
-                                                   name="service_ids[]" 
+                                                   name="service_id" 
                                                    value="{{ $service->id }}" 
                                                    id="service_{{ $service->id }}"
                                                    class="service-checkbox"
@@ -100,7 +100,7 @@
                                     <h5 class="mb-0">Выберите дату и время</h5>
                                     <div class="d-flex align-items-center">
                                         <select id="barber_filter" class="form-select me-3">
-                                            <option value="all">Все доступные</option>
+                                            <option value="all">Все мастера</option>
                                             @foreach($barbers as $barber)
                                                 <option value="{{ $barber->id }}">{{ $barber->name }}</option>
                                             @endforeach
@@ -109,43 +109,75 @@
                                 </div>
 
                                 <div class="calendar-strip mb-4">
-                                    <div class="month-title mb-2">Январь-февраль</div>
-                                    <div class="days-strip">
-                                        <button type="button" class="btn-nav prev">
+                                    <div class="month-navigation d-flex justify-content-between align-items-center mb-3">
+                                        <button type="button" class="btn btn-link text-dark prev-month">
                                             <i class="fas fa-chevron-left"></i>
                                         </button>
-                                        <div class="days-scroll" id="daysStrip">
-                                            <!-- Дни будут добавлены через JavaScript -->
-                                        </div>
-                                        <button type="button" class="btn-nav next">
+                                        <h6 class="month-title mb-0">Февраль</h6>
+                                        <button type="button" class="btn btn-link text-dark next-month">
                                             <i class="fas fa-chevron-right"></i>
                                         </button>
+                                    </div>
+                                    <div class="days-strip">
+                                        <div class="days-grid">
+                                            @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
+                                                <div class="day-name">{{ $day }}</div>
+                                            @endforeach
+                                            <div class="day-button disabled">4</div>
+                                            <div class="day-button">5</div>
+                                            <div class="day-button">6</div>
+                                            <div class="day-button active">7</div>
+                                            <div class="day-button">8</div>
+                                            <div class="day-button weekend">9</div>
+                                            <div class="day-button weekend">10</div>
+                                            <!-- Дополнительные дни будут добавляться динамически -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="time-slots-container">
+                                    <div class="time-section mb-4">
+                                        <h6 class="time-section-title mb-3">Утро</h6>
+                                        <div class="time-grid">
+                                            <button type="button" class="time-slot disabled">10:45</button>
+                                            <button type="button" class="time-slot">11:00</button>
+                                            <button type="button" class="time-slot">11:15</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="time-section mb-4">
+                                        <h6 class="time-section-title mb-3">День</h6>
+                                        <div class="time-grid">
+                                            <button type="button" class="time-slot">12:00</button>
+                                            <button type="button" class="time-slot">12:15</button>
+                                            <button type="button" class="time-slot">12:30</button>
+                                            <button type="button" class="time-slot">12:45</button>
+                                            <button type="button" class="time-slot">13:00</button>
+                                            <button type="button" class="time-slot">13:15</button>
+                                            <button type="button" class="time-slot">13:30</button>
+                                            <button type="button" class="time-slot">13:45</button>
+                                            <button type="button" class="time-slot">14:00</button>
+                                            <button type="button" class="time-slot">14:15</button>
+                                            <button type="button" class="time-slot">14:30</button>
+                                            <button type="button" class="time-slot">14:45</button>
+                                            <button type="button" class="time-slot">15:00</button>
+                                            <button type="button" class="time-slot">15:15</button>
+                                            <button type="button" class="time-slot">15:30</button>
+                                            <button type="button" class="time-slot">15:45</button>
+                                            <button type="button" class="time-slot">16:00</button>
+                                            <button type="button" class="time-slot">16:15</button>
+                                            <button type="button" class="time-slot">16:30</button>
+                                            <button type="button" class="time-slot">16:45</button>
+                                            <button type="button" class="time-slot">17:00</button>
+                                            <button type="button" class="time-slot">17:15</button>
+                                            <button type="button" class="time-slot">17:30</button>
+                                            <button type="button" class="time-slot">17:45</button>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <input type="hidden" name="appointment_date" id="appointment_date" required>
                                 <input type="hidden" name="appointment_time" id="appointment_time" required>
-
-                                <div class="time-slots" id="timeSlots" style="display: none;">
-                                    <div class="time-slots-section">
-                                        <h6 class="time-section-title">Утро</h6>
-                                        <div class="time-slots-grid morning-slots">
-                                            <!-- Слоты времени будут добавлены через JavaScript -->
-                                        </div>
-                                    </div>
-                                    <div class="time-slots-section">
-                                        <h6 class="time-section-title">День</h6>
-                                        <div class="time-slots-grid day-slots">
-                                            <!-- Слоты времени будут добавлены через JavaScript -->
-                                        </div>
-                                    </div>
-                                    <div class="time-slots-section">
-                                        <h6 class="time-section-title">Вечер</h6>
-                                        <div class="time-slots-grid evening-slots">
-                                            <!-- Слоты времени будут добавлены через JavaScript -->
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="d-flex justify-content-between">
@@ -319,132 +351,101 @@
 
 .calendar-strip {
     background: #fff;
-    border-radius: 10px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.month-title {
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.day-name {
+    font-size: 0.85rem;
+    color: #6c757d;
+    padding: 8px;
     font-weight: 500;
-    color: #333;
 }
 
-.days-strip {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.btn-nav {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-    color: #333;
+.day-button {
+    padding: 8px;
+    border-radius: 8px;
     cursor: pointer;
-    z-index: 2;
-}
-
-.days-scroll {
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    padding: 0.5rem 0;
-}
-
-.days-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.day-btn {
-    min-width: 60px;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 10px;
+    transition: all 0.2s ease;
     background: #f8f9fa;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.2s;
+    border: 2px solid transparent;
 }
 
-.day-btn .weekday {
-    font-size: 0.8rem;
-    color: #666;
-    text-transform: lowercase;
-}
-
-.day-btn .date {
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
-.day-btn:hover:not(.disabled) {
+.day-button:hover:not(.disabled) {
     background: #e9ecef;
     transform: translateY(-2px);
 }
 
-.day-btn.active {
+.day-button.active {
     background: var(--accent-color);
     color: white;
+    border-color: var(--accent-color);
 }
 
-.day-btn.active .weekday {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.day-btn.disabled {
+.day-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: #f8f9fa;
+    background: #e9ecef;
 }
 
-.time-slots {
-    margin-top: 1.5rem;
-}
-
-.time-slots-section {
-    margin-bottom: 1.5rem;
+.day-button.weekend {
+    color: var(--accent-color);
 }
 
 .time-section-title {
-    margin-bottom: 1rem;
-    color: #666;
+    color: #495057;
+    font-weight: 600;
 }
 
-.time-slots-grid {
+.time-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 0.5rem;
+    gap: 8px;
 }
 
 .time-slot {
-    padding: 0.75rem;
-    text-align: center;
-    background: #f8f9fa;
-    border-radius: 10px;
+    padding: 8px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    color: #495057;
 }
 
 .time-slot:hover:not(.disabled) {
-    background: #e9ecef;
+    border-color: var(--accent-color);
     transform: translateY(-2px);
 }
 
 .time-slot.active {
     background: var(--accent-color);
     color: white;
+    border-color: var(--accent-color);
 }
 
 .time-slot.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    background: #f8f9fa;
+}
+
+.month-navigation {
+    padding: 0.5rem 0;
+}
+
+.month-title {
+    font-weight: 600;
+    color: #495057;
 }
 </style>
 
@@ -453,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
     const barberSelect = document.getElementById('barber_filter');
     const dateInput = document.getElementById('appointment_date');
-    const timeSelect = document.getElementById('appointment_time');
+    const timeInput = document.getElementById('appointment_time');
     const continueButton = document.getElementById('continue-to-step2');
     const submitButton = document.getElementById('submit-button');
     const backButton = document.getElementById('back-to-step1');
@@ -468,13 +469,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalPrice = document.querySelector('.total-price');
     const totalDurationStep2 = document.querySelector('.total-duration-step2');
     const totalPriceStep2 = document.querySelector('.total-price-step2');
-    const timeSlots = document.getElementById('timeSlots');
-    const morningSlots = document.querySelector('.morning-slots');
-    const daySlots = document.querySelector('.day-slots');
-    const eveningSlots = document.querySelector('.evening-slots');
-    const daysStrip = document.getElementById('daysStrip');
-    const prevButton = document.querySelector('.btn-nav.prev');
-    const nextButton = document.querySelector('.btn-nav.next');
+    const prevMonthBtn = document.querySelector('.prev-month');
+    const nextMonthBtn = document.querySelector('.next-month');
+    const monthTitle = document.querySelector('.month-title');
+    const daysGrid = document.querySelector('.days-grid');
+    const timeSlots = document.querySelectorAll('.time-slot');
 
     let currentDate = new Date();
     let selectedDate = null;
@@ -526,144 +525,115 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateSubmitButton() {
-        submitButton.disabled = !barberSelect.value || !dateInput.value || !timeSelect.value;
+        const anyServiceSelected = Array.from(serviceCheckboxes).some(cb => cb.checked);
+        const barberSelected = barberSelect.value && barberSelect.value !== 'all';
+        const dateSelected = dateInput.value;
+        const timeSelected = timeInput.value;
+        
+        submitButton.disabled = !anyServiceSelected || !barberSelected || !dateSelected || !timeSelected;
     }
 
-    function generateDays() {
-        daysStrip.innerHTML = '';
-        const today = new Date();
+    function generateCalendar() {
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
         
-        // Генерируем дни на неделю вперед
-        for(let i = 0; i < 14; i++) {
-            const date = new Date(currentDate);
-            date.setDate(date.getDate() + i);
-            
-            const dayBtn = document.createElement('button');
-            dayBtn.type = 'button';
-            dayBtn.className = 'day-btn';
-            if (date < today) {
-                dayBtn.classList.add('disabled');
+        monthTitle.textContent = monthNames[currentDate.getMonth()];
+        
+        // Очищаем сетку дней, оставляя названия дней недели
+        const dayNames = Array.from(daysGrid.querySelectorAll('.day-name'));
+        daysGrid.innerHTML = '';
+        dayNames.forEach(dayName => daysGrid.appendChild(dayName));
+
+        // Добавляем пустые ячейки в начале месяца
+        for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'day-button disabled';
+            daysGrid.appendChild(emptyDay);
+        }
+
+        // Добавляем дни месяца
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayButton = document.createElement('div');
+            dayButton.className = 'day-button';
+            dayButton.textContent = day;
+
+            const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Если день в прошлом
+            if (currentDateObj < today) {
+                dayButton.classList.add('disabled');
+            } 
+            // Если выходной (суббота или воскресенье)
+            else if (currentDateObj.getDay() === 0 || currentDateObj.getDay() === 6) {
+                dayButton.classList.add('weekend');
             }
-            if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
-                dayBtn.classList.add('active');
+            // Если это сегодняшний день
+            else if (currentDateObj.getTime() === today.getTime()) {
+                dayButton.classList.add('active');
+                selectedDate = currentDateObj;
+                dateInput.value = currentDateObj.toISOString().split('T')[0];
             }
 
-            const weekday = date.toLocaleDateString('ru-RU', { weekday: 'short' });
-            const dayNum = date.getDate();
-
-            dayBtn.innerHTML = `
-                <span class="weekday">${weekday}</span>
-                <span class="date">${dayNum}</span>
-            `;
-
-            if (!dayBtn.classList.contains('disabled')) {
-                dayBtn.addEventListener('click', () => selectDate(date, dayBtn));
+            if (!dayButton.classList.contains('disabled')) {
+                dayButton.addEventListener('click', () => selectDate(currentDateObj, dayButton));
             }
 
-            daysStrip.appendChild(dayBtn);
+            daysGrid.appendChild(dayButton);
         }
     }
 
     function selectDate(date, button) {
-        const prevActive = document.querySelector('.day-btn.active');
+        const prevActive = daysGrid.querySelector('.day-button.active');
         if (prevActive) {
             prevActive.classList.remove('active');
         }
 
         selectedDate = date;
         button.classList.add('active');
-
-        // Обновляем скрытое поле с датой
-        const formattedDate = date.toISOString().split('T')[0];
-        document.getElementById('appointment_date').value = formattedDate;
-
-        // Загружаем доступное время
-        if (barberSelect.value) {
-            updateAvailableTimes();
-        }
-    }
-
-    function updateAvailableTimes() {
-        const barberId = barberSelect.value;
-        const selectedServices = Array.from(serviceCheckboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-
-        if (!barberId || selectedServices.length === 0 || !selectedDate) return;
-
-        const formattedDate = selectedDate.toISOString().split('T')[0];
-        const queryParams = new URLSearchParams({
-            barber_id: barberId,
-            date: formattedDate,
-            service_ids: selectedServices
-        });
-
-        timeSlots.style.display = 'none';
-        fetch(`/appointments/available-times?${queryParams}`)
-            .then(response => response.json())
-            .then(data => {
-                morningSlots.innerHTML = '';
-                daySlots.innerHTML = '';
-                eveningSlots.innerHTML = '';
-
-                data.available_times.forEach(time => {
-                    const hour = parseInt(time.split(':')[0]);
-                    const timeSlot = document.createElement('button');
-                    timeSlot.type = 'button';
-                    timeSlot.className = 'time-slot';
-                    timeSlot.textContent = time;
-                    
-                    timeSlot.addEventListener('click', () => selectTime(time, timeSlot));
-
-                    if (hour < 12) {
-                        morningSlots.appendChild(timeSlot);
-                    } else if (hour < 17) {
-                        daySlots.appendChild(timeSlot);
-                    } else {
-                        eveningSlots.appendChild(timeSlot);
-                    }
-                });
-
-                timeSlots.style.display = 'block';
-                updateSubmitButton();
-            });
-    }
-
-    function selectTime(time, element) {
-        // Убираем активный класс у предыдущего выбранного времени
-        const previousActive = document.querySelector('.time-slot.active');
-        if (previousActive) {
-            previousActive.classList.remove('active');
-        }
-
-        // Добавляем активный класс новому времени
-        element.classList.add('active');
-        selectedTime = time;
-        document.getElementById('appointment_time').value = time;
+        dateInput.value = date.toISOString().split('T')[0];
         updateSubmitButton();
     }
 
-    // Обработчики для кнопок навигации
-    prevButton.addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() - 7);
-        generateDays();
-    });
+    function selectTime(time, button) {
+        const prevActive = document.querySelector('.time-slot.active');
+        if (prevActive) {
+            prevActive.classList.remove('active');
+        }
 
-    nextButton.addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() + 7);
-        generateDays();
-    });
+        selectedTime = time;
+        button.classList.add('active');
+        timeInput.value = time;
+        updateSubmitButton();
+    }
 
     // Инициализация календаря
-    generateDays();
+    generateCalendar();
 
+    // Обработчики событий
     serviceCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateServicesInfo);
     });
 
-    barberSelect.addEventListener('change', updateAvailableTimes);
-    dateInput.addEventListener('change', updateAvailableTimes);
-    timeSelect.addEventListener('change', updateSubmitButton);
+    barberSelect.addEventListener('change', updateSubmitButton);
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar();
+    });
+
+    timeSlots.forEach(slot => {
+        if (!slot.classList.contains('disabled')) {
+            slot.addEventListener('click', () => selectTime(slot.textContent.trim(), slot));
+        }
+    });
 
     continueButton.addEventListener('click', function() {
         step1Content.classList.remove('active');
@@ -679,7 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
         step1Indicator.classList.add('active');
     });
 
-    // Добавляем обработчики для кликабельных шагов
     step1Indicator.addEventListener('click', function() {
         if (step2Content.classList.contains('active')) {
             step2Content.classList.remove('active');
@@ -690,12 +659,64 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     step2Indicator.addEventListener('click', function() {
-        if (step1Content.classList.contains('active')) {
+        if (step1Content.classList.contains('active') && continueButton.disabled === false) {
             step1Content.classList.remove('active');
             step2Content.classList.add('active');
             step1Indicator.classList.remove('active');
             step2Indicator.classList.add('active');
         }
+    });
+
+    // Обновляем обработку отправки формы
+    const appointmentForm = document.getElementById('appointmentForm');
+    
+    appointmentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const anyServiceSelected = Array.from(serviceCheckboxes).some(cb => cb.checked);
+        const barberSelected = barberSelect.value && barberSelect.value !== 'all';
+        const dateSelected = dateInput.value;
+        const timeSelected = timeInput.value;
+
+        if (!anyServiceSelected || !barberSelected || !dateSelected || !timeSelected) {
+            alert('Пожалуйста, заполните все необходимые поля');
+            return;
+        }
+
+        // Добавляем barber_id в formData
+        formData.set('barber_id', barberSelect.value);
+
+        // Отправляем форму через fetch
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                let errorMessage = 'Пожалуйста, исправьте следующие ошибки:\n\n';
+                Object.keys(data.errors).forEach(key => {
+                    errorMessage += `${data.errors[key].join('\n')}\n`;
+                });
+                alert(errorMessage);
+            } else if (data.message) {
+                alert(data.message);
+                if (data.success) {
+                    window.location.href = '/appointments';
+                }
+            } else {
+                window.location.href = '/appointments';
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз.');
+        });
     });
 });
 </script>

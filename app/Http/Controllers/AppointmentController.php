@@ -37,25 +37,59 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'barber_id' => 'required|exists:barbers,id',
-            'service_id' => 'required|exists:services,id',
-            'appointment_date' => 'required|date|after_or_equal:today',
-            'appointment_time' => 'required'
-        ]);
+        try {
+            $validated = $request->validate([
+                'barber_id' => 'required|exists:barbers,id',
+                'service_id' => 'required|exists:services,id',
+                'appointment_date' => 'required|date|after_or_equal:today',
+                'appointment_time' => ['required', 'date_format:H:i']
+            ]);
 
-        $appointmentDateTime = Carbon::parse($request->appointment_date . ' ' . $request->appointment_time);
-        
-        $appointment = Appointment::create([
-            'user_id' => auth()->id(),
-            'barber_id' => $request->barber_id,
-            'service_id' => $request->service_id,
-            'appointment_time' => $appointmentDateTime,
-            'status' => 'pending'
-        ]);
+            $appointmentDateTime = Carbon::parse($request->appointment_date . ' ' . $request->appointment_time);
+            
+            // Проверяем доступность времени
+            $isAvailable = $this->checkTimeAvailability(
+                $request->barber_id,
+                $request->service_id,
+                $appointmentDateTime
+            );
 
-        return redirect()->route('appointments.show', $appointment)
-            ->with('success', 'Запись успешно создана');
+            if (!$isAvailable) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Выбранное время уже занято. Пожалуйста, выберите другое время.'
+                ], 422);
+            }
+
+            $appointment = Appointment::create([
+                'user_id' => auth()->id(),
+                'barber_id' => $request->barber_id,
+                'service_id' => $request->service_id,
+                'appointment_time' => $appointmentDateTime,
+                'status' => 'pending'
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Запись успешно создана',
+                    'appointment' => $appointment
+                ]);
+            }
+
+            return redirect()->route('appointments.show', $appointment)
+                ->with('success', 'Запись успешно создана');
+        } catch (\Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Произошла ошибка при создании записи',
+                    'errors' => ['general' => [$e->getMessage()]]
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => 'Произошла ошибка при создании записи'])->withInput();
+        }
     }
 
     /**
@@ -137,33 +171,34 @@ class AppointmentController extends Controller
         $service = Service::findOrFail($serviceId);
 
         // Проверяем рабочие часы мастера
-        $dayOfWeek = $appointmentDateTime->locale('ru')->isoFormat('dddd');
-        $workingHours = json_decode($barber->working_hours, true);
+        $dayOfWeek = strtolower($appointmentDateTime->format('D')); // Получаем сокращенное название дня недели (mon, tue, etc.)
+        $workingHours = $barber->getWorkingHoursForDay($dayOfWeek);
         
-        if (!isset($workingHours[$dayOfWeek])) {
+        if (empty($workingHours)) {
             return false;
         }
 
         // Парсим рабочие часы
-        list($startTime, $endTime) = explode(' - ', $workingHours[$dayOfWeek]);
-        $workStart = Carbon::parse($appointmentDateTime->format('Y-m-d') . ' ' . $startTime);
-        $workEnd = Carbon::parse($appointmentDateTime->format('Y-m-d') . ' ' . $endTime);
+        list($startTime, $endTime) = explode('-', $workingHours);
+        $workStart = Carbon::parse($appointmentDateTime->format('Y-m-d') . ' ' . trim($startTime));
+        $workEnd = Carbon::parse($appointmentDateTime->format('Y-m-d') . ' ' . trim($endTime));
 
         // Проверяем, попадает ли время записи в рабочие часы
-        if ($appointmentDateTime < $workStart || $appointmentDateTime->addMinutes($service->duration) > $workEnd) {
+        $appointmentEnd = (clone $appointmentDateTime)->addMinutes($service->duration);
+        if ($appointmentDateTime < $workStart || $appointmentEnd > $workEnd) {
             return false;
         }
 
         // Проверяем, нет ли пересечений с другими записями
         $conflictingAppointments = Appointment::where('barber_id', $barberId)
             ->where('status', '!=', 'cancelled')
-            ->where(function ($query) use ($appointmentDateTime, $service) {
+            ->where(function ($query) use ($appointmentDateTime, $appointmentEnd) {
                 $query->whereBetween('appointment_time', [
                     $appointmentDateTime,
-                    $appointmentDateTime->copy()->addMinutes($service->duration)
+                    $appointmentEnd
                 ])
-                ->orWhere(function ($q) use ($appointmentDateTime, $service) {
-                    $q->where('appointment_time', '<=', $appointmentDateTime)
+                ->orWhere(function ($q) use ($appointmentDateTime, $appointmentEnd) {
+                    $q->where('appointment_time', '<', $appointmentEnd)
                         ->whereRaw('DATE_ADD(appointment_time, INTERVAL (SELECT duration FROM services WHERE id = appointments.service_id) MINUTE) > ?', [
                             $appointmentDateTime
                         ]);
@@ -171,7 +206,19 @@ class AppointmentController extends Controller
             })
             ->exists();
 
-        return !$conflictingAppointments;
+        // Проверяем, нет ли блокировок времени
+        $conflictingBlocks = $barber->blockedTimes()
+            ->where(function ($query) use ($appointmentDateTime, $appointmentEnd) {
+                $query->whereBetween('start_time', [$appointmentDateTime, $appointmentEnd])
+                    ->orWhereBetween('end_time', [$appointmentDateTime, $appointmentEnd])
+                    ->orWhere(function ($q) use ($appointmentDateTime, $appointmentEnd) {
+                        $q->where('start_time', '<=', $appointmentDateTime)
+                            ->where('end_time', '>=', $appointmentEnd);
+                    });
+            })
+            ->exists();
+
+        return !$conflictingAppointments && !$conflictingBlocks;
     }
 
     public function getAvailableTimes(Request $request)

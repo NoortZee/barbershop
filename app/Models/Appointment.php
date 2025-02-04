@@ -37,16 +37,34 @@ class Appointment extends Model
         return $this->belongsTo(Service::class);
     }
 
-    public function getFormattedStatusAttribute()
+    public function getStatusTextAttribute()
     {
-        $statuses = [
+        return [
             'pending' => 'Ожидает подтверждения',
             'confirmed' => 'Подтверждена',
             'completed' => 'Завершена',
             'cancelled' => 'Отменена'
-        ];
+        ][$this->status] ?? $this->status;
+    }
 
-        return $statuses[$this->status] ?? $this->status;
+    public function getStatusColorAttribute()
+    {
+        return [
+            'pending' => 'warning',
+            'confirmed' => 'info',
+            'completed' => 'success',
+            'cancelled' => 'danger'
+        ][$this->status] ?? 'secondary';
+    }
+
+    public function getCanCancelAttribute()
+    {
+        if ($this->status === 'cancelled' || $this->status === 'completed') {
+            return false;
+        }
+
+        // Можно отменить запись не позднее чем за 2 часа
+        return $this->appointment_time->diffInHours(now()) >= 2;
     }
 
     public function getFormattedDateAttribute()

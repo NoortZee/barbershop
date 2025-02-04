@@ -41,5 +41,22 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_admin' => 'boolean'
     ];
+
+    /**
+     * Получить все записи пользователя
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
+     * Проверить, является ли пользователь администратором
+     */
+    public function isAdmin()
+    {
+        return $this->is_admin;
+    }
 }

@@ -3,43 +3,83 @@
 @section('title', 'Наши барберы')
 
 @section('content')
-<section class="barbers-hero" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/barbers-bg.jpg'); background-size: cover; background-position: center; padding: 150px 0 100px;">
-    <div class="container text-center text-white">
-        <h1 class="display-4 mb-4 fade-in-up">Наши мастера</h1>
-        <p class="lead fade-in-up">Профессионалы, которые создают ваш безупречный стиль</p>
-    </div>
-</section>
-
-<section class="barbers-section py-5">
-    <div class="container">
-        <div class="row g-4">
+@if(auth()->check() && auth()->user()->is_admin)
+    {{-- Вид для администратора --}}
+    <div class="container py-5">
+        <h1 class="mb-4">Управление графиком работы барберов</h1>
+        <div class="row">
             @foreach($barbers as $barber)
-                <div class="col-lg-4 col-md-6 fade-in-up">
-                    <div class="barber-card">
-                        @if($barber->photo)
-                            <div class="barber-image">
-                                <img src="{{ asset('storage/' . $barber->photo) }}" alt="{{ $barber->name }}" class="img-fluid">
-                                <div class="barber-overlay">
-                                    <a href="/appointments/create?barber_id={{ $barber->id }}" class="btn btn-premium">Записаться</a>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="card-title">{{ $barber->name }}</h3>
+                                    <p class="text-muted mb-0">{{ $barber->specialization }}</p>
                                 </div>
+                                <a href="{{ route('barbers.schedule.edit', $barber) }}" 
+                                   class="btn btn-primary">
+                                    Редактировать график
+                                </a>
                             </div>
-                        @endif
-                        <div class="barber-info text-center p-4">
-                            <h3 class="barber-name">{{ $barber->name }}</h3>
-                            <p class="barber-position text-muted">Мастер-барбер</p>
-                            <p class="barber-experience">Опыт работы: {{ $barber->experience }} лет</p>
-                            <p class="barber-description">{{ $barber->description }}</p>
-                            <div class="barber-social mt-3">
-                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-vk"></i></a>
-                            </div>
+                            @if($barber->working_hours)
+                                <div class="mt-3">
+                                    <h5>Текущий график:</h5>
+                                    <ul class="list-unstyled">
+                                        @foreach(['mon' => 'Пн', 'tue' => 'Вт', 'wed' => 'Ср', 'thu' => 'Чт', 'fri' => 'Пт', 'sat' => 'Сб', 'sun' => 'Вс'] as $day => $dayName)
+                                            <li>
+                                                {{ $dayName }}: {{ $barber->working_hours[$day] ?? 'Выходной' }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             @endforeach
         </div>
     </div>
-</section>
+@else
+    {{-- Обычный вид для клиентов --}}
+    <section class="barbers-hero" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/barbers-bg.jpg'); background-size: cover; background-position: center; padding: 150px 0 100px;">
+        <div class="container text-center text-white">
+            <h1 class="display-4 mb-4 fade-in-up">Наши мастера</h1>
+            <p class="lead fade-in-up">Профессионалы, которые создают ваш безупречный стиль</p>
+        </div>
+    </section>
+
+    <section class="barbers-section py-5">
+        <div class="container">
+            <div class="row g-4">
+                @foreach($barbers as $barber)
+                    <div class="col-lg-4 col-md-6 fade-in-up">
+                        <div class="barber-card">
+                            @if($barber->photo)
+                                <div class="barber-image">
+                                    <img src="{{ asset('storage/' . $barber->photo) }}" alt="{{ $barber->name }}" class="img-fluid">
+                                    <div class="barber-overlay">
+                                        <a href="/appointments/create?barber_id={{ $barber->id }}" class="btn btn-premium">Записаться</a>
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="barber-info text-center p-4">
+                                <h3 class="barber-name">{{ $barber->name }}</h3>
+                                <p class="barber-position text-muted">{{ $barber->specialization }}</p>
+                                <p class="barber-experience">Опыт работы: {{ $barber->experience }} лет</p>
+                                <p class="barber-description">{{ $barber->bio }}</p>
+                                <div class="barber-social mt-3">
+                                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-vk"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
 
 <style>
 .barbers-hero {

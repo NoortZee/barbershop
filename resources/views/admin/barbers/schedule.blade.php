@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'ru',
         initialView: 'timeGridWeek',
+        firstDay: 1,
         slotMinTime: '09:00:00',
         slotMaxTime: '21:00:00',
         slotDuration: '00:30:00',

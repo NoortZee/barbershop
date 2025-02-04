@@ -592,6 +592,20 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = !anyServiceSelected || !barberSelected || !dateSelected || !timeSelected;
     }
 
+    // Добавляем функцию форматирования дня недели
+    function formatDayOfWeek(date) {
+        const days = {
+            0: 'sun',
+            1: 'mon',
+            2: 'tue',
+            3: 'wed',
+            4: 'thu',
+            5: 'fri',
+            6: 'sat'
+        };
+        return days[date.getDay()];
+    }
+
     function generateCalendar() {
         const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
         const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -600,12 +614,15 @@ document.addEventListener('DOMContentLoaded', function() {
         monthTitle.textContent = monthNames[currentDate.getMonth()];
         
         // Очищаем сетку дней, оставляя названия дней недели
-        const dayNames = Array.from(daysGrid.querySelectorAll('.day-name'));
+        const dayNamesElements = Array.from(daysGrid.querySelectorAll('.day-name'));
         daysGrid.innerHTML = '';
-        dayNames.forEach(dayName => daysGrid.appendChild(dayName));
+        dayNamesElements.forEach(dayName => daysGrid.appendChild(dayName));
+
+        // Корректируем firstDay для начала недели с понедельника
+        let adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
 
         // Добавляем пустые ячейки в начале месяца
-        for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+        for (let i = 0; i < adjustedFirstDay; i++) {
             const emptyDay = document.createElement('div');
             emptyDay.className = 'day-button disabled';
             daysGrid.appendChild(emptyDay);
@@ -628,12 +645,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentDateObj < today) {
                 dayButton.classList.add('disabled');
             } 
-            // Если выходной (суббота или воскресенье)
-            else if (currentDateObj.getDay() === 0 || currentDateObj.getDay() === 6) {
-                dayButton.classList.add('weekend');
+            // Проверяем выходные дни
+            else {
+                const dayOfWeek = formatDayOfWeek(currentDateObj);
+                if (dayOfWeek === 'sat' || dayOfWeek === 'sun') {
+                    dayButton.classList.add('weekend');
+                }
             }
             // Если это сегодняшний день
-            else if (currentDateObj.getTime() === today.getTime()) {
+            if (currentDateObj.getTime() === today.getTime()) {
                 dayButton.classList.add('today');
             }
 
@@ -653,7 +673,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         selectedDate = date;
         button.classList.add('active');
-        dateInput.value = date.toISOString().split('T')[0];
+        
+        // Форматируем дату для отправки на сервер
+        const formattedDate = date.toISOString().split('T')[0];
+        dateInput.value = formattedDate;
+        
+        // Добавляем день недели в data-атрибут для дополнительной проверки
+        button.dataset.dayOfWeek = formatDayOfWeek(date);
         
         // Проверяем доступность времени при выборе даты
         checkAvailableTimeSlots();
@@ -670,6 +696,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Получаем день недели выбранной даты
+        const dayOfWeek = formatDayOfWeek(selectedDate);
+
         // Делаем все слоты неактивными на время проверки
         document.querySelectorAll('.time-slot').forEach(slot => {
             slot.classList.add('disabled');
@@ -678,8 +707,16 @@ document.addEventListener('DOMContentLoaded', function() {
             slot.replaceWith(slot.cloneNode(true));
         });
 
+        // Выводим данные запроса в консоль для отладки
+        console.log('Отправляем запрос с параметрами:', {
+            date: dateInput.value,
+            barber_id: barberSelect.value,
+            service_id: selectedServices[0].value,
+            day_of_week: dayOfWeek
+        });
+
         // Запрашиваем доступные слоты
-        fetch(`/appointments/available-times?date=${dateInput.value}&barber_id=${barberSelect.value}&service_id=${selectedServices[0].value}`, {
+        fetch(`/appointments/available-times?date=${dateInput.value}&barber_id=${barberSelect.value}&service_id=${selectedServices[0].value}&day_of_week=${dayOfWeek}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
@@ -688,6 +725,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            // Выводим ответ в консоль для отладки
+            console.log('Получен ответ:', data);
+
             // Если есть ошибка или нет доступных слотов
             if (data.error || !data.available_times || data.available_times.length === 0) {
                 noSlotsMessage.style.display = 'block';

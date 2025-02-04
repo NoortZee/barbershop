@@ -435,10 +435,23 @@
     color: var(--accent-color);
 }
 
+.day-button.weekend.active {
+    color: white;
+}
+
+.day-button.weekend:hover:not(.disabled) {
+    background: var(--accent-color);
+    color: white;
+}
+
 .day-button.today {
     border: 2px solid var(--accent-color);
     color: var(--accent-color);
     font-weight: 600;
+}
+
+.day-button.today.active {
+    color: white;
 }
 
 .day-button.today:hover:not(.disabled) {

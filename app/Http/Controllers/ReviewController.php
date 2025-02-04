@@ -94,7 +94,7 @@ class ReviewController extends Controller
 
         $review->update($validated);
 
-        return redirect()->route('reviews.show', $review)
+        return redirect()->route('reviews.index')
             ->with('success', 'Отзыв успешно обновлен');
     }
 

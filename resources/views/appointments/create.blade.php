@@ -139,39 +139,67 @@
                                     <div class="time-section mb-4">
                                         <h6 class="time-section-title mb-3">Утро</h6>
                                         <div class="time-grid">
-                                            <button type="button" class="time-slot disabled">10:45</button>
-                                            <button type="button" class="time-slot">11:00</button>
-                                            <button type="button" class="time-slot">11:15</button>
+                                            <button type="button" class="time-slot" data-time="09:00">09:00</button>
+                                            <button type="button" class="time-slot" data-time="09:15">09:15</button>
+                                            <button type="button" class="time-slot" data-time="09:30">09:30</button>
+                                            <button type="button" class="time-slot" data-time="09:45">09:45</button>
+                                            <button type="button" class="time-slot" data-time="10:00">10:00</button>
+                                            <button type="button" class="time-slot" data-time="10:15">10:15</button>
+                                            <button type="button" class="time-slot" data-time="10:30">10:30</button>
+                                            <button type="button" class="time-slot" data-time="10:45">10:45</button>
+                                            <button type="button" class="time-slot" data-time="11:00">11:00</button>
+                                            <button type="button" class="time-slot" data-time="11:15">11:15</button>
+                                            <button type="button" class="time-slot" data-time="11:30">11:30</button>
+                                            <button type="button" class="time-slot" data-time="11:45">11:45</button>
                                         </div>
                                     </div>
 
                                     <div class="time-section mb-4">
                                         <h6 class="time-section-title mb-3">День</h6>
                                         <div class="time-grid">
-                                            <button type="button" class="time-slot">12:00</button>
-                                            <button type="button" class="time-slot">12:15</button>
-                                            <button type="button" class="time-slot">12:30</button>
-                                            <button type="button" class="time-slot">12:45</button>
-                                            <button type="button" class="time-slot">13:00</button>
-                                            <button type="button" class="time-slot">13:15</button>
-                                            <button type="button" class="time-slot">13:30</button>
-                                            <button type="button" class="time-slot">13:45</button>
-                                            <button type="button" class="time-slot">14:00</button>
-                                            <button type="button" class="time-slot">14:15</button>
-                                            <button type="button" class="time-slot">14:30</button>
-                                            <button type="button" class="time-slot">14:45</button>
-                                            <button type="button" class="time-slot">15:00</button>
-                                            <button type="button" class="time-slot">15:15</button>
-                                            <button type="button" class="time-slot">15:30</button>
-                                            <button type="button" class="time-slot">15:45</button>
-                                            <button type="button" class="time-slot">16:00</button>
-                                            <button type="button" class="time-slot">16:15</button>
-                                            <button type="button" class="time-slot">16:30</button>
-                                            <button type="button" class="time-slot">16:45</button>
-                                            <button type="button" class="time-slot">17:00</button>
-                                            <button type="button" class="time-slot">17:15</button>
-                                            <button type="button" class="time-slot">17:30</button>
-                                            <button type="button" class="time-slot">17:45</button>
+                                            <button type="button" class="time-slot" data-time="12:00">12:00</button>
+                                            <button type="button" class="time-slot" data-time="12:15">12:15</button>
+                                            <button type="button" class="time-slot" data-time="12:30">12:30</button>
+                                            <button type="button" class="time-slot" data-time="12:45">12:45</button>
+                                            <button type="button" class="time-slot" data-time="13:00">13:00</button>
+                                            <button type="button" class="time-slot" data-time="13:15">13:15</button>
+                                            <button type="button" class="time-slot" data-time="13:30">13:30</button>
+                                            <button type="button" class="time-slot" data-time="13:45">13:45</button>
+                                            <button type="button" class="time-slot" data-time="14:00">14:00</button>
+                                            <button type="button" class="time-slot" data-time="14:15">14:15</button>
+                                            <button type="button" class="time-slot" data-time="14:30">14:30</button>
+                                            <button type="button" class="time-slot" data-time="14:45">14:45</button>
+                                            <button type="button" class="time-slot" data-time="15:00">15:00</button>
+                                            <button type="button" class="time-slot" data-time="15:15">15:15</button>
+                                            <button type="button" class="time-slot" data-time="15:30">15:30</button>
+                                            <button type="button" class="time-slot" data-time="15:45">15:45</button>
+                                            <button type="button" class="time-slot" data-time="16:00">16:00</button>
+                                            <button type="button" class="time-slot" data-time="16:15">16:15</button>
+                                            <button type="button" class="time-slot" data-time="16:30">16:30</button>
+                                            <button type="button" class="time-slot" data-time="16:45">16:45</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="time-section mb-4">
+                                        <h6 class="time-section-title mb-3">Вечер</h6>
+                                        <div class="time-grid">
+                                            <button type="button" class="time-slot" data-time="17:00">17:00</button>
+                                            <button type="button" class="time-slot" data-time="17:15">17:15</button>
+                                            <button type="button" class="time-slot" data-time="17:30">17:30</button>
+                                            <button type="button" class="time-slot" data-time="17:45">17:45</button>
+                                            <button type="button" class="time-slot" data-time="18:00">18:00</button>
+                                            <button type="button" class="time-slot" data-time="18:15">18:15</button>
+                                            <button type="button" class="time-slot" data-time="18:30">18:30</button>
+                                            <button type="button" class="time-slot" data-time="18:45">18:45</button>
+                                            <button type="button" class="time-slot" data-time="19:00">19:00</button>
+                                            <button type="button" class="time-slot" data-time="19:15">19:15</button>
+                                            <button type="button" class="time-slot" data-time="19:30">19:30</button>
+                                            <button type="button" class="time-slot" data-time="19:45">19:45</button>
+                                            <button type="button" class="time-slot" data-time="20:00">20:00</button>
+                                            <button type="button" class="time-slot" data-time="20:15">20:15</button>
+                                            <button type="button" class="time-slot" data-time="20:30">20:30</button>
+                                            <button type="button" class="time-slot" data-time="20:45">20:45</button>
+                                            <button type="button" class="time-slot" data-time="21:00">21:00</button>
                                         </div>
                                     </div>
                                 </div>
@@ -400,6 +428,17 @@
     color: var(--accent-color);
 }
 
+.day-button.today {
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.day-button.today:hover:not(.disabled) {
+    background: var(--accent-color);
+    color: white;
+}
+
 .time-section-title {
     color: #495057;
     font-weight: 600;
@@ -552,6 +591,10 @@ document.addEventListener('DOMContentLoaded', function() {
             daysGrid.appendChild(emptyDay);
         }
 
+        // Получаем текущую дату без времени
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         // Добавляем дни месяца
         for (let day = 1; day <= daysInMonth; day++) {
             const dayButton = document.createElement('div');
@@ -559,10 +602,9 @@ document.addEventListener('DOMContentLoaded', function() {
             dayButton.textContent = day;
 
             const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            currentDateObj.setHours(0, 0, 0, 0);
 
-            // Если день в прошлом
+            // Если дата в прошлом или это прошедшее время сегодняшнего дня
             if (currentDateObj < today) {
                 dayButton.classList.add('disabled');
             } 
@@ -572,9 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             // Если это сегодняшний день
             else if (currentDateObj.getTime() === today.getTime()) {
-                dayButton.classList.add('active');
-                selectedDate = currentDateObj;
-                dateInput.value = currentDateObj.toISOString().split('T')[0];
+                dayButton.classList.add('today');
             }
 
             if (!dayButton.classList.contains('disabled')) {
@@ -594,19 +634,82 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedDate = date;
         button.classList.add('active');
         dateInput.value = date.toISOString().split('T')[0];
+        
+        // Проверяем доступность времени при выборе даты
+        checkAvailableTimeSlots();
         updateSubmitButton();
     }
 
-    function selectTime(time, button) {
-        const prevActive = document.querySelector('.time-slot.active');
-        if (prevActive) {
-            prevActive.classList.remove('active');
+    function checkAvailableTimeSlots() {
+        const selectedServices = Array.from(serviceCheckboxes).filter(cb => cb.checked);
+        if (!selectedDate || !barberSelect.value || barberSelect.value === 'all' || selectedServices.length === 0) {
+            return;
         }
 
-        selectedTime = time;
-        button.classList.add('active');
-        timeInput.value = time;
-        updateSubmitButton();
+        // Делаем все слоты неактивными на время проверки
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.classList.add('disabled');
+            slot.disabled = true;
+            // Удаляем все обработчики событий
+            slot.replaceWith(slot.cloneNode(true));
+        });
+
+        // Запрашиваем доступные слоты
+        fetch(`/appointments/available-times?date=${dateInput.value}&barber_id=${barberSelect.value}&service_id=${selectedServices[0].value}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Сначала делаем все слоты неактивными
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.add('disabled');
+                slot.disabled = true;
+                // Удаляем все обработчики событий
+                slot.replaceWith(slot.cloneNode(true));
+            });
+
+            // Если есть ошибка, показываем её
+            if (data.error) {
+                console.log('Server error:', data.error);
+                alert(data.error);
+                return;
+            }
+
+            // Активируем доступные слоты
+            if (data.available_times && data.available_times.length > 0) {
+                data.available_times.forEach(time => {
+                    const slot = document.querySelector(`.time-slot[data-time="${time}"]`);
+                    if (slot) {
+                        slot.classList.remove('disabled');
+                        slot.disabled = false;
+                        slot.addEventListener('click', () => {
+                            // Убираем активный класс у предыдущего выбранного слота
+                            const prevActive = document.querySelector('.time-slot.active');
+                            if (prevActive) {
+                                prevActive.classList.remove('active');
+                            }
+                            // Добавляем активный класс текущему слоту
+                            slot.classList.add('active');
+                            timeInput.value = time;
+                            updateSubmitButton();
+                        });
+                    }
+                });
+            } else {
+                console.log('No available time slots for this date');
+                if (!data.error) {
+                    alert('На выбранную дату нет доступных временных слотов');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при проверке доступного времени:', error);
+            alert('Произошла ошибка при проверке доступного времени. Пожалуйста, попробуйте еще раз.');
+        });
     }
 
     // Инициализация календаря
@@ -614,10 +717,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Обработчики событий
     serviceCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateServicesInfo);
+        checkbox.addEventListener('change', () => {
+            checkAvailableTimeSlots();
+            updateServicesInfo();
+        });
     });
 
-    barberSelect.addEventListener('change', updateSubmitButton);
+    barberSelect.addEventListener('change', checkAvailableTimeSlots);
 
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
@@ -627,12 +733,6 @@ document.addEventListener('DOMContentLoaded', function() {
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         generateCalendar();
-    });
-
-    timeSlots.forEach(slot => {
-        if (!slot.classList.contains('disabled')) {
-            slot.addEventListener('click', () => selectTime(slot.textContent.trim(), slot));
-        }
     });
 
     continueButton.addEventListener('click', function() {

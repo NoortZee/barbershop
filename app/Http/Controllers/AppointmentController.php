@@ -223,59 +223,210 @@ class AppointmentController extends Controller
 
     public function getAvailableTimes(Request $request)
     {
-        $request->validate([
-            'date' => 'required|date|after_or_equal:today',
-            'barber_id' => 'required|exists:barbers,id',
-            'service_id' => 'required|exists:services,id'
-        ]);
+        try {
+            \Log::info('getAvailableTimes request:', $request->all());
 
-        $barber = Barber::findOrFail($request->barber_id);
-        $service = Service::findOrFail($request->service_id);
-        $date = Carbon::parse($request->date);
+            $request->validate([
+                'date' => 'required|date|after_or_equal:today',
+                'barber_id' => 'required|exists:barbers,id',
+                'service_id' => 'required|exists:services,id'
+            ]);
 
-        // Получаем рабочие часы мастера для выбранного дня
-        $workingHours = $barber->working_hours[strtolower($date->format('l'))] ?? null;
-        if (!$workingHours) {
-            return response()->json(['available_times' => []]);
-        }
+            $date = $request->get('date');
+            $barberId = $request->get('barber_id');
+            $serviceId = $request->get('service_id');
 
-        // Разбиваем рабочие часы на начало и конец
-        list($startTime, $endTime) = explode('-', $workingHours);
-        $startDateTime = Carbon::parse($request->date . ' ' . trim($startTime));
-        $endDateTime = Carbon::parse($request->date . ' ' . trim($endTime));
+            // Проверяем корректность даты
+            try {
+                $requestDate = Carbon::parse($date);
+                if ($requestDate->isPast() && !$requestDate->isToday()) {
+                    return response()->json([
+                        'error' => 'Выбранная дата уже прошла',
+                        'available_times' => []
+                    ], 200);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error parsing request date:', [
+                    'date' => $date,
+                    'error' => $e->getMessage()
+                ]);
+                return response()->json([
+                    'error' => 'Некорректный формат даты',
+                    'available_times' => []
+                ], 200);
+            }
 
-        // Получаем все существующие записи на этот день
-        $existingAppointments = Appointment::where('barber_id', $barber->id)
-            ->whereDate('appointment_time', $date)
-            ->where('status', '!=', 'cancelled')
-            ->orderBy('appointment_time')
-            ->get();
+            // Получаем текущее время
+            $now = Carbon::now();
+            \Log::info('Current time:', ['now' => $now->toDateTimeString()]);
 
-        // Генерируем временные слоты с интервалом 15 минут
-        $availableTimes = [];
-        $currentTime = clone $startDateTime;
+            // Получаем мастера и услугу
+            try {
+                $barber = \App\Models\Barber::findOrFail($barberId);
+                $service = \App\Models\Service::findOrFail($serviceId);
 
-        while ($currentTime->addMinutes(15) <= $endDateTime) {
-            $slotEndTime = (clone $currentTime)->addMinutes($service->duration);
-            
-            // Проверяем, не пересекается ли слот с существующими записями
-            $isAvailable = true;
-            foreach ($existingAppointments as $appointment) {
-                $appointmentEndTime = (clone $appointment->appointment_time)->addMinutes($appointment->service->duration);
+                \Log::info('Found barber and service:', [
+                    'barber_id' => $barber->id,
+                    'barber_name' => $barber->name,
+                    'service_id' => $service->id,
+                    'service_name' => $service->name,
+                    'service_duration' => $service->duration
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error finding barber or service:', [
+                    'barber_id' => $barberId,
+                    'service_id' => $serviceId,
+                    'error' => $e->getMessage()
+                ]);
+                return response()->json([
+                    'error' => 'Мастер или услуга не найдены',
+                    'available_times' => []
+                ], 200);
+            }
+
+            // Получаем рабочие часы мастера на этот день недели
+            $dayOfWeek = strtolower($requestDate->format('D'));
+            $workingHours = $barber->getWorkingHoursForDay($dayOfWeek);
+
+            \Log::info('Working hours:', [
+                'day_of_week' => $dayOfWeek,
+                'working_hours' => $workingHours
+            ]);
+
+            if (!$workingHours) {
+                return response()->json([
+                    'error' => 'В этот день мастер не работает',
+                    'available_times' => []
+                ], 200);
+            }
+
+            // Проверяем формат рабочих часов
+            if (!str_contains($workingHours, '-')) {
+                \Log::error('Invalid working hours format:', ['working_hours' => $workingHours]);
+                return response()->json([
+                    'error' => 'Неверный формат рабочих часов',
+                    'available_times' => []
+                ], 200);
+            }
+
+            // Разбираем рабочие часы
+            try {
+                list($startTime, $endTime) = explode('-', $workingHours);
+                $startTime = Carbon::parse($date . ' ' . trim($startTime));
+                $endTime = Carbon::parse($date . ' ' . trim($endTime));
+
+                \Log::info('Parsed working hours:', [
+                    'start_time' => $startTime->toDateTimeString(),
+                    'end_time' => $endTime->toDateTimeString()
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error parsing working hours:', [
+                    'working_hours' => $workingHours,
+                    'error' => $e->getMessage()
+                ]);
+                return response()->json([
+                    'error' => 'Ошибка при обработке рабочих часов',
+                    'available_times' => []
+                ], 200);
+            }
+
+            // Получаем все записи мастера на этот день
+            $appointments = \App\Models\Appointment::where('barber_id', $barberId)
+                ->whereDate('appointment_time', $date)
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
+            \Log::info('Found appointments:', [
+                'count' => $appointments->count(),
+                'appointments' => $appointments->map(fn($a) => [
+                    'time' => $a->appointment_time,
+                    'duration' => $a->service->duration
+                ])
+            ]);
+
+            // Генерируем все возможные временные слоты
+            $timeSlots = [];
+            $currentTime = clone $startTime;
+
+            while ($currentTime->lt($endTime)) {
+                $slotEndTime = (clone $currentTime)->addMinutes($service->duration);
                 
-                if (($currentTime >= $appointment->appointment_time && $currentTime < $appointmentEndTime) ||
-                    ($slotEndTime > $appointment->appointment_time && $slotEndTime <= $appointmentEndTime) ||
-                    ($currentTime <= $appointment->appointment_time && $slotEndTime >= $appointmentEndTime)) {
-                    $isAvailable = false;
+                if ($slotEndTime->gt($endTime)) {
                     break;
                 }
+
+                // Пропускаем слоты, которые уже прошли
+                if ($currentTime->lt($now)) {
+                    $currentTime->addMinutes(15);
+                    continue;
+                }
+
+                $isAvailable = true;
+
+                // Проверяем, не пересекается ли слот с существующими записями
+                foreach ($appointments as $appointment) {
+                    $appointmentStart = Carbon::parse($appointment->appointment_time);
+                    $appointmentEnd = (clone $appointmentStart)->addMinutes($appointment->service->duration);
+
+                    if (
+                        ($currentTime->between($appointmentStart, $appointmentEnd)) ||
+                        ($slotEndTime->between($appointmentStart, $appointmentEnd)) ||
+                        ($currentTime->lte($appointmentStart) && $slotEndTime->gte($appointmentEnd))
+                    ) {
+                        $isAvailable = false;
+                        break;
+                    }
+                }
+
+                // Проверяем заблокированное время
+                if ($isAvailable) {
+                    $blockedTimes = $barber->blockedTimes()->whereDate('start_time', $date)->get();
+                    foreach ($blockedTimes as $blockedTime) {
+                        $blockedStart = Carbon::parse($blockedTime->start_time);
+                        $blockedEnd = Carbon::parse($blockedTime->end_time);
+
+                        if (
+                            ($currentTime->between($blockedStart, $blockedEnd)) ||
+                            ($slotEndTime->between($blockedStart, $blockedEnd)) ||
+                            ($currentTime->lte($blockedStart) && $slotEndTime->gte($blockedEnd))
+                        ) {
+                            $isAvailable = false;
+                            break;
+                        }
+                    }
+                }
+
+                if ($isAvailable) {
+                    $timeSlots[] = $currentTime->format('H:i');
+                }
+
+                $currentTime->addMinutes(15);
             }
 
-            if ($isAvailable && $slotEndTime <= $endDateTime) {
-                $availableTimes[] = $currentTime->format('H:i');
-            }
+            \Log::info('Generated available time slots:', [
+                'count' => count($timeSlots),
+                'slots' => $timeSlots
+            ]);
+
+            return response()->json([
+                'available_times' => $timeSlots,
+                'working_hours' => $workingHours,
+                'date' => $date,
+                'day_of_week' => $dayOfWeek
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in getAvailableTimes:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+            
+            return response()->json([
+                'error' => 'Произошла ошибка при проверке доступного времени',
+                'details' => $e->getMessage(),
+                'available_times' => []
+            ], 200); // Возвращаем 200 вместо 500 для лучшей обработки на клиенте
         }
-
-        return response()->json(['available_times' => $availableTimes]);
     }
 }

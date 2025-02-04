@@ -57,8 +57,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Маршрут для проверки доступного времени должен быть ДО ресурсного маршрута
+    Route::get('/appointments/available-times', [AppointmentController::class, 'getAvailableTimes'])
+        ->name('appointments.available-times');
+    
     Route::resource('appointments', AppointmentController::class);
-    Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+    Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
+        ->name('appointments.update-status');
     Route::resource('reviews', ReviewController::class)->except(['index', 'show']);
 });
 

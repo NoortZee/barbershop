@@ -227,7 +227,7 @@ class AppointmentController extends Controller
             \Log::info('getAvailableTimes request:', $request->all());
 
             $request->validate([
-                'date' => 'required|date|after_or_equal:today',
+                'date' => 'required|date',
                 'barber_id' => 'required|exists:barbers,id',
                 'service_id' => 'required|exists:services,id'
             ]);
@@ -235,15 +235,41 @@ class AppointmentController extends Controller
             $date = $request->get('date');
             $barberId = $request->get('barber_id');
             $serviceId = $request->get('service_id');
-            $dayOfWeek = $request->get('day_of_week');
+            
+            // Получаем день недели из даты
+            $dayOfWeek = strtolower(Carbon::parse($date)->format('D'));
+            
+            \Log::info('Date info:', [
+                'date' => $date,
+                'day_of_week' => $dayOfWeek,
+                'barber_id' => $barberId,
+                'service_id' => $serviceId
+            ]);
 
             // Получаем текущее время
             $now = Carbon::now();
+            
+            \Log::info('Time info:', [
+                'current_time' => $now->toDateTimeString(),
+                'timezone' => config('app.timezone'),
+                'php_timezone' => date_default_timezone_get()
+            ]);
 
             // Проверяем корректность даты
             try {
                 $requestDate = Carbon::parse($date);
-                if ($requestDate->isPast() && !$requestDate->isToday()) {
+                $now = Carbon::now();
+                
+                \Log::info('Date comparison:', [
+                    'request_date' => $requestDate->toDateString(),
+                    'now' => $now->toDateString(),
+                    'is_past' => $requestDate->isPast(),
+                    'is_today' => $requestDate->isToday(),
+                    'comparison' => $requestDate->toDateString() . ' vs ' . $now->toDateString()
+                ]);
+
+                // Изменяем проверку даты
+                if ($requestDate->lt($now->startOfDay())) {
                     return response()->json([
                         'error' => 'Выбранная дата уже прошла',
                         'available_times' => []
@@ -264,14 +290,15 @@ class AppointmentController extends Controller
             $service = Service::findOrFail($serviceId);
 
             // Получаем рабочие часы мастера на этот день недели
-            $workingHours = $barber->getWorkingHoursForDay($dayOfWeek);
+            $workingHours = $barber->getWorkingHoursForDay($dayOfWeek) ?? $barber::$defaultWorkingHours[$dayOfWeek];
 
             \Log::info('Working hours:', [
                 'day_of_week' => $dayOfWeek,
-                'working_hours' => $workingHours
+                'working_hours' => $workingHours,
+                'default_hours' => $barber::$defaultWorkingHours[$dayOfWeek]
             ]);
 
-            if (!$workingHours) {
+            if (empty($workingHours)) {
                 return response()->json([
                     'error' => 'В этот день мастер не работает',
                     'available_times' => []
@@ -286,8 +313,14 @@ class AppointmentController extends Controller
 
                 \Log::info('Parsed working hours:', [
                     'start_time' => $startTime->toDateTimeString(),
-                    'end_time' => $endTime->toDateTimeString()
+                    'end_time' => $endTime->toDateTimeString(),
+                    'raw_start' => trim($startTime),
+                    'raw_end' => trim($endTime)
                 ]);
+
+                if ($startTime->gt($endTime)) {
+                    throw new \Exception('Invalid working hours range');
+                }
             } catch (\Exception $e) {
                 \Log::error('Error parsing working hours:', [
                     'working_hours' => $workingHours,
@@ -364,6 +397,15 @@ class AppointmentController extends Controller
             \Log::info('Generated available time slots:', [
                 'count' => count($timeSlots),
                 'slots' => $timeSlots
+            ]);
+
+            // После получения рабочих часов
+            \Log::info('Working hours details:', [
+                'barber_id' => $barberId,
+                'working_hours' => $workingHours,
+                'start_time' => isset($startTime) ? $startTime->toDateTimeString() : null,
+                'end_time' => isset($endTime) ? $endTime->toDateTimeString() : null,
+                'service_duration' => $service->duration
             ]);
 
             return response()->json([

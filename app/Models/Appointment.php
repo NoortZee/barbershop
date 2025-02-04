@@ -64,7 +64,7 @@ class Appointment extends Model
         }
 
         // Можно отменить запись не позднее чем за 2 часа
-        return $this->appointment_time->diffInHours(now()) >= 2;
+        return now()->diffInHours($this->appointment_time, false) >= 2;
     }
 
     public function getFormattedDateAttribute()

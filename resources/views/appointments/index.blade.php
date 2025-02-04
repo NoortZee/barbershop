@@ -38,7 +38,6 @@
                                         @endif
                                         <th>Мастер</th>
                                         <th>Услуга</th>
-                                        <th>Статус</th>
                                         <th>Действия</th>
                                     </tr>
                                 </thead>
@@ -60,30 +59,19 @@
                                                 </small>
                                             </td>
                                             <td>
-                                                <span class="badge bg-{{ $appointment->status_color }}">
-                                                    {{ $appointment->status_text }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="{{ route('appointments.show', $appointment) }}" 
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    @if($appointment->can_cancel)
-                                                        <form action="{{ route('appointments.destroy', $appointment) }}" 
-                                                              method="POST" 
-                                                              class="d-inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" 
-                                                                    class="btn btn-sm btn-outline-danger" 
-                                                                    onclick="return confirm('Вы уверены, что хотите отменить запись?')">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </div>
+                                                @if($appointment->can_cancel)
+                                                    <form action="{{ route('appointments.destroy', $appointment) }}" 
+                                                          method="POST" 
+                                                          class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" 
+                                                                class="btn btn-sm btn-outline-danger" 
+                                                                onclick="return confirm('Вы уверены, что хотите отменить запись?')">
+                                                            <i class="fas fa-times"></i> Отменить
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
